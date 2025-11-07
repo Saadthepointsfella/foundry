@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm install --filter=@vibefoundry/studio && pnpm --filter=@vibefoundry/studio build",
+  "devCommand": "pnpm --filter=@vibefoundry/studio dev",
+  "installCommand": "pnpm install",
+  "framework": "nextjs",
+  "outputDirectory": "apps/studio/.next",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD apps/studio packages/"
+}
