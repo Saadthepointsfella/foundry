@@ -1,0 +1,115 @@
+[
+  {
+    "id": "xcut.types.strict",
+    "name": "Strict typing",
+    "summary": "Use strict type checking and shared types across boundaries.",
+    "category": "cross-cutting",
+    "must": [
+      "Enable strict type checking (noImplicitAny, strictNullChecks or equivalents).",
+      "Share types/schemas across boundaries instead of re-defining shapes.",
+      "Run type-checking as part of CI."
+    ],
+    "enforce": {
+      "build": ["pnpm tsc --noEmit"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "hard"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "xcut.sec.secrets.envonly",
+    "name": "Secrets discipline",
+    "summary": "Never commit secrets; load them from environment or secret manager.",
+    "category": "cross-cutting",
+    "must": [
+      "Do not hard-code secrets, API keys, or credentials in code or config.",
+      "Load secrets from environment variables or secret manager.",
+      "Ensure sample configs use placeholders, not real values."
+    ],
+    "enforce": {
+      "security": [
+        "git-secrets --scan",
+        "trufflehog filesystem --no-update"
+      ]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "hard"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "xcut.obs.structlog",
+    "name": "Structured logging",
+    "summary": "Emit structured logs with correlation and latency fields.",
+    "category": "cross-cutting",
+    "must": [
+      "Use structured logging (JSON-like) for server logs.",
+      "Include correlation_id / request_id, status, and latency_ms fields.",
+      "Avoid logging sensitive data (PII, secrets)."
+    ],
+    "enforce": {
+      "tests": ["pnpm test:logs"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "xcut.sec.validate.edge",
+    "name": "Input validation at the edge",
+    "summary": "Validate external inputs with schemas as early as possible.",
+    "category": "cross-cutting",
+    "must": [
+      "Validate all external inputs (HTTP, CLI, events) against schemas.",
+      "Return clear 4xx errors on validation failures.",
+      "Do not trust client-side validation alone."
+    ],
+    "enforce": {
+      "tests": ["pnpm test:validate"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "xcut.versioning.deprecation",
+    "name": "Versioning & deprecation",
+    "summary": "Track and communicate breaking changes via versioning and deprecation paths.",
+    "category": "cross-cutting",
+    "must": [
+      "Use semantic versioning or equivalent for public contracts.",
+      "Mark deprecated APIs with clear sunset timelines.",
+      "Avoid silent breaking changes."
+    ],
+    "enforce": {
+      "tests": ["pnpm test:contracts:versioning"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  }
+]

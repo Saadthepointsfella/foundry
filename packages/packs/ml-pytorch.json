@@ -1,0 +1,168 @@
+[
+  {
+    "id": "ml.det.seeded",
+    "name": "Determinism toggles",
+    "summary": "Seed randomness and document any tolerated nondeterminism.",
+    "category": "ml",
+    "must": [
+      "Set seeds for Python, NumPy, and PyTorch where feasible.",
+      "Document whether CUDA nondeterminism is acceptable for this workload.",
+      "Use deterministic algorithms when correctness depends on reproducibility."
+    ],
+    "enforce": {
+      "tests": ["pytest tests/ml/test_seeding.py"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "ml.data.lineage",
+    "name": "Data lineage",
+    "summary": "Track dataset versions, schemas, and splits.",
+    "category": "ml",
+    "must": [
+      "Assign stable IDs or hashes to datasets used for training and evaluation.",
+      "Record schema changes and migration steps for features.",
+      "Treat train/validation/test splits as immutable artifacts."
+    ],
+    "enforce": {
+      "tests": ["pytest tests/ml/test_lineage.py"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "ml.features.contracts",
+    "name": "Feature contracts",
+    "summary": "Typed features with ranges and drift monitoring.",
+    "category": "ml",
+    "must": [
+      "Define feature schemas with types, units, and allowed ranges.",
+      "Monitor input feature distributions in production for drift.",
+      "Alert when drift exceeds agreed thresholds."
+    ],
+    "enforce": {
+      "tests": ["pytest tests/ml/test_features.py"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "ml.train.repro",
+    "name": "Training reproducibility",
+    "summary": "Log configs, checkpoints, and environment for training runs.",
+    "category": "ml",
+    "must": [
+      "Log training hyperparameters and code version for each run.",
+      "Persist model checkpoints with associated config and dataset identifiers.",
+      "Record environment information (CUDA/cuDNN versions, GPU type)."
+    ],
+    "enforce": {
+      "tests": ["pytest tests/ml/test_repro.py"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "ml.eval.holdout",
+    "name": "Evaluation integrity",
+    "summary": "Use strict holdout sets and guard against leakage.",
+    "category": "ml",
+    "must": [
+      "Maintain a true holdout dataset that is not used for model selection.",
+      "Check for overlap or leakage between training and evaluation data.",
+      "Report evaluation metrics with confidence intervals where possible."
+    ],
+    "enforce": {
+      "tests": ["pytest tests/ml/test_eval.py"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "ml.safety.filters",
+    "name": "Safety filters",
+    "summary": "Apply safety filters and PII stripping to logs and outputs.",
+    "category": "ml",
+    "must": [
+      "Strip or mask PII in logs and training data where applicable.",
+      "Apply output filters for harmful content in user-facing systems.",
+      "Log only anonymized or aggregated statistics for sensitive fields."
+    ],
+    "enforce": {
+      "security": ["pytest tests/ml/test_safety.py"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "ml.perf.qps",
+    "name": "Serving latency & throughput",
+    "summary": "Track p95 inference latency and throughput targets.",
+    "category": "ml",
+    "must": [
+      "Define target p95 latency for inference endpoints.",
+      "Measure throughput at realistic batch sizes.",
+      "Expose metrics for latency and QPS in monitoring."
+    ],
+    "thresholds": {
+      "p95_ms": 300,
+      "target_qps": 50
+    },
+    "enforce": {
+      "perf": ["k6 run perf/ml_smoke.js"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "thresholds": {
+          "p95_ms": 600,
+          "target_qps": 20
+        },
+        "strictness": "soft"
+      },
+      "pro": {
+        "thresholds": {
+          "p95_ms": 300,
+          "target_qps": 50
+        },
+        "strictness": "hard"
+      }
+    }
+  }
+]

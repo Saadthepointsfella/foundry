@@ -1,0 +1,192 @@
+[
+  {
+    "id": "be.http.idempotency",
+    "name": "HTTP idempotency",
+    "summary": "Ensure safe and idempotent behavior for HTTP verbs.",
+    "category": "backend",
+    "must": [
+      "Implement PUT and DELETE handlers to be idempotent.",
+      "Guard POST endpoints against duplicate submissions where relevant (idempotency keys).",
+      "Avoid side-effects in GET handlers."
+    ],
+    "enforce": {
+      "tests": ["pytest tests/api/test_idempotency.py"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "be.api.schema-first",
+    "name": "Schema-first API",
+    "summary": "Use OpenAPI/JSON Schema as the source of truth for REST APIs.",
+    "category": "backend",
+    "must": [
+      "Define request and response schemas in OpenAPI/JSON Schema.",
+      "Generate server and client types from the schema where possible.",
+      "Add contract tests that validate implementation against schema."
+    ],
+    "enforce": {
+      "tests": ["pytest tests/api/test_contracts.py"],
+      "build": ["openapi-diff base.yaml new.yaml --fail-on-breaking"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "be.io.validate",
+    "name": "I/O validation",
+    "summary": "Validate request/response payloads at system boundaries.",
+    "category": "backend",
+    "must": [
+      "Validate incoming payloads with pydantic or schema library.",
+      "Return clear 4xx errors on validation failures.",
+      "Sanitize or omit sensitive fields from responses."
+    ],
+    "enforce": {
+      "tests": ["pytest tests/api/test_validation.py"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "be.err.taxonomy",
+    "name": "Error taxonomy",
+    "summary": "Consistent mapping of domain errors to HTTP status codes.",
+    "category": "backend",
+    "must": [
+      "Use a structured error type for domain errors.",
+      "Map domain errors to appropriate HTTP status codes (4xx vs 5xx).",
+      "Avoid returning 200 with error payloads."
+    ],
+    "enforce": {
+      "tests": ["pytest tests/api/test_errors.py"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "be.db.tx-bounds",
+    "name": "Transaction boundaries",
+    "summary": "Keep DB transactions short and well-bounded.",
+    "category": "backend",
+    "must": [
+      "Avoid long-running operations while holding DB transactions open.",
+      "Use retry with backoff for transient failures.",
+      "Ensure background jobs use explicit transactions when needed."
+    ],
+    "enforce": {
+      "tests": ["pytest tests/db/test_transactions.py"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "be.perf.slo",
+    "name": "Backend SLOs",
+    "summary": "Track and honor p95 latency and query-count budgets per endpoint.",
+    "category": "backend",
+    "must": [
+      "Define p95 latency targets for key endpoints.",
+      "Keep DB queries per request within defined budgets.",
+      "Fail fast when upstreams are degraded instead of cascading failures."
+    ],
+    "thresholds": {
+      "p95_ms": 250,
+      "db_queries_per_request": 20
+    },
+    "enforce": {
+      "perf": ["k6 run perf/smoke.js"],
+      "tests": ["pytest tests/perf/test_queries.py"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "thresholds": {
+          "p95_ms": 500,
+          "db_queries_per_request": 40
+        },
+        "strictness": "soft"
+      },
+      "pro": {
+        "thresholds": {
+          "p95_ms": 250,
+          "db_queries_per_request": 20
+        },
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "be.obs.triplet",
+    "name": "Observability triplet",
+    "summary": "Trace id, span id, and user id attached to every request.",
+    "category": "backend",
+    "must": [
+      "Attach trace_id and span_id to logs and metrics.",
+      "Include the authenticated user id (if present) in request contexts.",
+      "Propagate correlation IDs across service boundaries."
+    ],
+    "enforce": {
+      "tests": ["pytest tests/obs/test_tracing.py"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "be.sec.ratelimit.authz",
+    "name": "Rate limiting & authz",
+    "summary": "Enforce auth, authorization, and rate limits on sensitive endpoints.",
+    "category": "backend",
+    "must": [
+      "Validate authentication tokens or sessions for protected endpoints.",
+      "Apply per-user or per-key quotas where appropriate.",
+      "Default-deny access to sensitive operations."
+    ],
+    "enforce": {
+      "security": ["pytest tests/sec/test_authz.py"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  }
+]

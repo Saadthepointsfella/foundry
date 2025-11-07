@@ -1,0 +1,113 @@
+[
+  {
+    "id": "ops.k8s.policies",
+    "name": "Kubernetes runtime policies",
+    "summary": "Resource limits, read-only root FS, and network policies.",
+    "category": "ops",
+    "must": [
+      "Specify resource requests and limits for all workloads.",
+      "Use readOnlyRootFilesystem for application containers where possible.",
+      "Apply NetworkPolicies to restrict traffic to required peers."
+    ],
+    "enforce": {
+      "security": ["opa test policies/"],
+      "tests": ["kubectl apply --dry-run=server -f k8s/"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "ops.build.immutable",
+    "name": "Immutable build artifacts",
+    "summary": "Build once, run anywhere with content-addressed images.",
+    "category": "ops",
+    "must": [
+      "Build container images once per commit and reuse them across environments.",
+      "Avoid mutating images at runtime (no in-place apt-get in containers).",
+      "Tag images with content hashes in addition to human-readable tags."
+    ],
+    "enforce": {
+      "build": ["pnpm ci:build-images"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "ops.sre.slo",
+    "name": "SLOs & error budgets",
+    "summary": "Define service-level objectives and error budgets.",
+    "category": "ops",
+    "must": [
+      "Define explicit SLOs for key user-facing endpoints.",
+      "Track error budget consumption over time.",
+      "Use burn-rate alerts to trigger incident response when budgets burn too quickly."
+    ],
+    "enforce": {
+      "tests": ["pnpm test:observability"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "ops.deploy.canary",
+    "name": "Safe rollouts",
+    "summary": "Use canary or blue/green deployments with automatic rollback.",
+    "category": "ops",
+    "must": [
+      "Roll out changes gradually with canary or blue/green strategies.",
+      "Monitor key metrics during rollout and rollback automatically on regression.",
+      "Document the rollout and rollback procedure."
+    ],
+    "enforce": {
+      "tests": ["pnpm test:deploy:plans"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "ops.cost.guardrails",
+    "name": "Cost guardrails",
+    "summary": "Budgets and cost allocation for services and namespaces.",
+    "category": "ops",
+    "must": [
+      "Define monthly or quarterly cost budgets for major services.",
+      "Tag resources with owner, environment, and cost-center metadata.",
+      "Alert on anomalous or runaway spend."
+    ],
+    "enforce": {
+      "perf": ["pnpm cost:scan"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  }
+]

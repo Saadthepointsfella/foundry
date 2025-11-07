@@ -1,0 +1,274 @@
+[
+  {
+    "id": "fe.component.pure-render",
+    "name": "Pure render components",
+    "summary": "React components are pure functions of props/state; side-effects live in hooks.",
+    "category": "frontend",
+    "must": [
+      "Keep React function components pure: no side-effects in render.",
+      "Use hooks (useEffect, useLayoutEffect, etc.) for side-effects and subscriptions.",
+      "Do not mutate props or external module state inside render."
+    ],
+    "enforce": {
+      "lint": ["pnpm lint"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "fe.state.local",
+    "name": "State locality",
+    "summary": "Keep transient UI state local; separate UI state from server/data state.",
+    "category": "frontend",
+    "must": [
+      "Prefer local component state for purely visual/transient concerns.",
+      "Keep server/data state in dedicated hooks or data layer (e.g. React Query, SWR).",
+      "Avoid network calls or side-effects inside reducers."
+    ],
+    "enforce": {
+      "lint": ["pnpm lint"],
+      "tests": ["pnpm test:ui"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "fe.a11y.baseline",
+    "name": "Accessibility baseline",
+    "summary": "Semantic HTML, labels, roles, and reasonable contrast.",
+    "category": "frontend",
+    "must": [
+      "Use semantic HTML for interactive elements (button, a, input, etc.).",
+      "All interactive controls must have accessible labels.",
+      "Avoid inaccessible keyboard-only flows."
+    ],
+    "thresholds": {
+      "a11y_min": 70
+    },
+    "enforce": {
+      "tests": ["pnpm test:a11y"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "thresholds": {
+          "a11y_min": 70
+        },
+        "strictness": "soft"
+      },
+      "pro": {
+        "thresholds": {
+          "a11y_min": 90
+        },
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "fe.style.tailwind.tokens",
+    "name": "Tailwind design tokens",
+    "summary": "Use Tailwind utilities and design tokens; avoid ad-hoc inline styles.",
+    "category": "frontend",
+    "must": [
+      "Use Tailwind utility classes for layout, spacing, and typography.",
+      "Avoid style objects in JSX except for dynamic calculations that cannot be expressed as classes.",
+      "Prefer shared component primitives for repeated patterns."
+    ],
+    "enforce": {
+      "lint": ["pnpm lint:style"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "fe.bundle.budget",
+    "name": "Bundle budget",
+    "summary": "Keep page bundles within a reasonable gzipped size.",
+    "category": "frontend",
+    "must": [
+      "Avoid heavy client-side dependencies unless strictly necessary.",
+      "Split code where appropriate (dynamic imports) for large, rarely used modules."
+    ],
+    "thresholds": {
+      "bundle_kb_gzip": 300
+    },
+    "enforce": {
+      "build": ["pnpm build"],
+      "perf": ["pnpm analyze:bundle"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "thresholds": {
+          "bundle_kb_gzip": 300
+        },
+        "strictness": "soft"
+      },
+      "pro": {
+        "thresholds": {
+          "bundle_kb_gzip": 200
+        },
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "fe.perf.render.cost",
+    "name": "Render cost hygiene",
+    "summary": "Limit excessive prop drilling and unnecessary re-renders.",
+    "category": "frontend",
+    "must": [
+      "Avoid prop drilling more than a few levels; prefer context or composition.",
+      "Memoize expensive subtrees where props are stable.",
+      "Avoid creating new function/array/object instances in render when possible."
+    ],
+    "thresholds": {
+      "max_prop_depth": 3
+    },
+    "enforce": {
+      "perf": ["pnpm test:perf:render"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "fe.routing.stable-ids",
+    "name": "Stable routing contracts",
+    "summary": "Stable keys and typed route params for React/Next.js routing.",
+    "category": "frontend",
+    "must": [
+      "Use stable keys for list items rendered under routes to avoid remounting.",
+      "Treat URL params as typed inputs and validate them at the edge.",
+      "Ensure 404 and error states are explicitly handled."
+    ],
+    "enforce": {
+      "tests": ["pnpm test:routes"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "fe.tests.rtl-min",
+    "name": "UI smoke tests",
+    "summary": "React Testing Library smoke tests for organisms/pages.",
+    "category": "frontend",
+    "must": [
+      "Every major screen or organism component should have at least one RTL smoke test.",
+      "Critical flows (happy path) must be covered."
+    ],
+    "thresholds": {
+      "ui_line_coverage_min": 30
+    },
+    "enforce": {
+      "tests": ["pnpm test:ui"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "thresholds": {
+          "ui_line_coverage_min": 30
+        },
+        "strictness": "soft"
+      },
+      "pro": {
+        "thresholds": {
+          "ui_line_coverage_min": 70
+        },
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "fe.ssr.hydration",
+    "name": "SSR hydration integrity",
+    "summary": "No client-only side-effects before mount; clean SSR/CSR parity.",
+    "category": "frontend",
+    "must": [
+      "Avoid reading browser-only globals (window, document) during SSR.",
+      "Guard any client-only behavior behind effects or runtime checks.",
+      "Avoid mismatched markup between server and client renders."
+    ],
+    "enforce": {
+      "tests": ["pnpm test:hydration"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "fe.media.images",
+    "name": "Image hygiene",
+    "summary": "Use optimized image components and proper sizing.",
+    "category": "frontend",
+    "must": [
+      "Use framework image components (e.g. next/image) where available.",
+      "Provide width/height or sizes attributes to prevent layout shift.",
+      "Avoid unbounded full-size images without lazy loading."
+    ],
+    "enforce": {
+      "perf": ["pnpm test:perf:images"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "fe.error.boundaries",
+    "name": "Error boundaries",
+    "summary": "Top-level error boundaries for critical UI surfaces.",
+    "category": "frontend",
+    "must": [
+      "Wrap major route segments or layout regions in error boundaries.",
+      "Provide a user-friendly fallback for failures instead of a blank screen.",
+      "Log boundary errors with enough context for debugging."
+    ],
+    "enforce": {
+      "tests": ["pnpm test:ui:error-boundaries"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  }
+]

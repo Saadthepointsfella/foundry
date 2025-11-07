@@ -1,0 +1,121 @@
+[
+  {
+    "id": "evm.state.det",
+    "name": "Deterministic state transitions",
+    "summary": "Contracts must have deterministic state transitions given inputs.",
+    "category": "blockchain",
+    "must": [
+      "Avoid using block.timestamp directly for critical logic without an oracle.",
+      "Do not rely on block-specific randomness for security.",
+      "Keep view/pure functions free of side-effects."
+    ],
+    "enforce": {
+      "tests": ["forge test --match-contract StateDeterminism"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "evm.sec.reentrancy-acl",
+    "name": "Reentrancy & access control",
+    "summary": "Protect against reentrancy and enforce least privilege.",
+    "category": "blockchain",
+    "must": [
+      "Use checks-effects-interactions or equivalent guard patterns.",
+      "Apply appropriate modifiers for access control on privileged functions.",
+      "Test for common reentrancy and privilege-escalation scenarios."
+    ],
+    "enforce": {
+      "security": ["slither .", "forge test --match-contract Security"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "evm.sec.math",
+    "name": "Math safety",
+    "summary": "Avoid integer overflow/underflow and precision issues.",
+    "category": "blockchain",
+    "must": [
+      "Use Solidity 0.8+ checked arithmetic or SafeMath-like libraries.",
+      "Unit test edge cases for large values and rounding behavior.",
+      "Avoid unchecked external arithmetic where possible."
+    ],
+    "enforce": {
+      "tests": ["forge test --match-contract Math"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "evm.perf.gas-budget",
+    "name": "Gas budgets",
+    "summary": "Keep functions within defined gas limits.",
+    "category": "blockchain",
+    "must": [
+      "Avoid unbounded loops over dynamic arrays in public functions.",
+      "Track gas usage for critical functions and compare against budgets.",
+      "Consider batching or off-chain computation for heavy workloads."
+    ],
+    "thresholds": {
+      "gas_limit_fn": 200000
+    },
+    "enforce": {
+      "perf": ["forge snapshot --gas-report"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "thresholds": {
+          "gas_limit_fn": 300000
+        },
+        "strictness": "soft"
+      },
+      "pro": {
+        "thresholds": {
+          "gas_limit_fn": 200000
+        },
+        "strictness": "hard"
+      }
+    }
+  },
+  {
+    "id": "evm.econ.invariants",
+    "name": "Economic invariants",
+    "summary": "Conservation and no-free-mint invariants for token flows.",
+    "category": "blockchain",
+    "must": [
+      "Test that token balances are conserved where appropriate.",
+      "Ensure there are no unintended free-mint or drain paths.",
+      "Use property-based tests for economic invariants when possible."
+    ],
+    "enforce": {
+      "tests": ["forge test --match-contract Invariants"]
+    },
+    "modeOverrides": {
+      "vibe": {
+        "strictness": "soft"
+      },
+      "pro": {
+        "strictness": "hard"
+      }
+    }
+  }
+]
