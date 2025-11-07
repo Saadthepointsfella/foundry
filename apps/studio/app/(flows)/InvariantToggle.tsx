@@ -31,7 +31,7 @@ export default function InvariantToggle({
     const current = overrides ?? resolved;
     const next = current.map((p) => {
       if (p.id !== id) return p;
-      const nextStrictness =
+      const nextStrictness: "off" | "soft" | "hard" =
         p.strictness === "hard"
           ? "soft"
           : p.strictness === "soft"
