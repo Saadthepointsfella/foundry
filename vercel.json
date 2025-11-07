@@ -1,8 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm install --filter=@vibefoundry/studio && pnpm --filter=@vibefoundry/studio build",
-  "devCommand": "pnpm --filter=@vibefoundry/studio dev",
-  "installCommand": "pnpm install",
-  "framework": "nextjs",
+  "buildCommand": "pnpm install && cd apps/studio && pnpm build",
+  "installCommand": "pnpm install --no-frozen-lockfile",
   "outputDirectory": "apps/studio/.next"
 }
